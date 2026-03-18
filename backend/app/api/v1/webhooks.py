@@ -108,6 +108,7 @@ async def webhook_github(
         data = json.loads(body)
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON")
+    
     action = data.get("action", "")
     event_name = request.headers.get("X-GitHub-Event", "event")
     repo = data.get("repository", {}).get("full_name", "repo")
@@ -129,9 +130,16 @@ async def webhook_github(
 
     title = f"GitHub {action or event_name}: {repo}"
     
+    # Store workspace activity
     user_id = _get_user_id_from_request(request, x_user_id)
     if user_id:
         await _store_workspace_activity(user_id, "GitHub", event_name, title, desc, sender, url)
+    
+    # Process for RAG
+    from app.services.github_service import process_github_webhook
+    async with async_session_factory() as session:
+        await process_github_webhook(session, data, event_name)
+        
     return {"ok": True}
 
 

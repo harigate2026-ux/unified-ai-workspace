@@ -24,7 +24,7 @@ app.add_middleware(
 
 register_exception_handlers(app)
 
-app.include_router(api_router, prefix="/api", tags=["api"])
+app.include_router(api_router, prefix="/api/v1", tags=["api"])
 
 
 @app.get("/health")

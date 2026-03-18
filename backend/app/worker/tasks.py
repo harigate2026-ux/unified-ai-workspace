@@ -66,6 +66,8 @@ async def prioritize_tasks(user_id: str) -> None:
     pass
 
 
+from app.worker.ingestion_tasks import ingest_data
+
 def run_job(job_type: str, payload: dict) -> None:
     """Sync entrypoint that runs async job (for worker process)."""
     import asyncio
@@ -75,3 +77,6 @@ def run_job(job_type: str, payload: dict) -> None:
         asyncio.run(generate_workspace_summary(payload.get("user_id", "")))
     elif job_type == "prioritize_tasks":
         asyncio.run(prioritize_tasks(payload.get("user_id", "")))
+    elif job_type == "ingest_data":
+        asyncio.run(ingest_data(payload.get("user_id", ""), payload.get("integration_name", "")))
+

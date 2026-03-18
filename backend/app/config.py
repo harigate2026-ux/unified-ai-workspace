@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     secret_key: str = "your-super-secret-key"
     google_client_id: str = ""
     google_client_secret: str = ""
+    github_client_id: str = ""
+    github_client_secret: str = ""
     frontend_url: str = "http://localhost:5173"
     api_url: str = "http://localhost:8000"
 
