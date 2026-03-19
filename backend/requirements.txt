@@ -26,6 +26,7 @@ torch==2.2.2+cpu
 numpy==1.26.4
 passlib[bcrypt]==1.7.4
 bcrypt==4.1.2
+pydantic[email]
 
 # Redis
 redis==5.2.1
