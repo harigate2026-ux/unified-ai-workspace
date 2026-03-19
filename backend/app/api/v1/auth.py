@@ -12,10 +12,40 @@ from app.api.deps import AsyncSessionDep
 from app.config import get_settings
 from app.db.models.user import User
 
-# We need to import our token generation function. We'll add it to services/auth.py.
-from app.services.auth import create_access_token
+from app.services.auth import create_access_token, get_password_hash, verify_password
+from app.schemas.user import UserCreate, UserLogin, Token
 
 router = APIRouter()
+
+@router.post("/signup", response_model=Token)
+async def signup(session: AsyncSessionDep, user_in: UserCreate):
+    result = await session.execute(select(User).where(User.email == user_in.email))
+    if result.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_password = get_password_hash(user_in.password)
+    new_user = User(
+        id=str(uuid.uuid4()),
+        email=user_in.email,
+        hashed_password=hashed_password,
+        name=user_in.name
+    )
+    session.add(new_user)
+    await session.commit()
+    
+    access_token = create_access_token(data={"sub": new_user.id}, secret_key=get_settings().secret_key)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/login", response_model=Token)
+async def login(session: AsyncSessionDep, user_in: UserLogin):
+    result = await session.execute(select(User).where(User.email == user_in.email))
+    user = result.scalar_one_or_none()
+    
+    if not user or not user.hashed_password or not verify_password(user_in.password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+    
+    access_token = create_access_token(data={"sub": user.id}, secret_key=get_settings().secret_key)
+    return {"access_token": access_token, "token_type": "bearer"}
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -27,7 +57,7 @@ async def google_login(request: Request):
     if not settings.google_client_id or not settings.google_client_secret:
         raise HTTPException(status_code=500, detail="Google Client ID/Secret not configured.")
 
-    redirect_uri = f"{settings.api_url}/api/auth/google/callback"
+    redirect_uri = f"{settings.api_url}/api/v1/auth/google/callback"
 
     params = {
         "client_id": settings.google_client_id,
@@ -55,7 +85,7 @@ async def google_callback(
     if not code:
         raise HTTPException(status_code=400, detail="Missing authorization code")
 
-    redirect_uri = f"{settings.api_url}/api/auth/google/callback"
+    redirect_uri = f"{settings.api_url}/api/v1/auth/google/callback"
 
     async with httpx.AsyncClient() as client:
         # 1. Exchange code for token
