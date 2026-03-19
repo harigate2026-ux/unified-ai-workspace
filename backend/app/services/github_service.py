@@ -298,7 +298,7 @@ async def register_github_webhooks(session: AsyncSession, user_id: str):
     
     settings = get_settings()
 
-    webhook_url = f"{settings.api_url}/api/webhooks/github"  # placeholder base url
+    webhook_url = f"{settings.api_url}/api/v1/webhooks/github"
 
     async with httpx.AsyncClient() as client:
         repos_resp = await client.get("https://api.github.com/user/repos", headers=headers)
