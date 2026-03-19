@@ -24,6 +24,7 @@ transformers==4.46.3
 sentence-transformers==2.7.0
 torch==2.2.2+cpu
 numpy==1.26.4
+passlib[bcrypt]==1.7.4
 
 # Redis
 redis==5.2.1
