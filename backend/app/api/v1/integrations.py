@@ -70,7 +70,7 @@ async def integration_oauth(
     
     from app.config import get_settings
     settings = get_settings()
-    auth_url = f"{settings.api_url}/api/integrations/{provider}/callback?state={current_user.id}&code=mock_oauth_code_123"
+    auth_url = f"{settings.api_url}/api/v1/integrations/{provider}/callback?state={current_user.id}&code=mock_oauth_code_123"
     from fastapi.responses import RedirectResponse
     return RedirectResponse(url=auth_url)
 
