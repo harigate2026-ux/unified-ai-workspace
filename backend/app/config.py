@@ -29,8 +29,10 @@ class Settings(BaseSettings):
   #  secret_key: str
     google_client_id: str
     google_client_secret: str
+    google_callback_uri: str
     github_client_id: str
     github_client_secret: str
+    
 
     # =========================
     # URLs (CRITICAL)
