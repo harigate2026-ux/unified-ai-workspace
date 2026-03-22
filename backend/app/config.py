@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     # =========================
     # Auth / Security
     # =========================
-    secret_key: str
+  #  secret_key: str
     google_client_id: str
     google_client_secret: str
     github_client_id: str
@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     # =========================
     slack_signing_secret: str
     github_client_secret: str
-    jira_client_secret: str
+    jira_api_token: str
     notion_client_secret: str
 
     class Config:
